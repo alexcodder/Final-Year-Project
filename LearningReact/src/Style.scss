@@ -29,7 +29,7 @@ a {
     justify-content: space-between;
     align-items: center;
     width: 500px;
-    a{
+    a {
       text-decoration: none;
       font-weight: 800;
       color: #333;
@@ -43,28 +43,34 @@ a {
 
   &__ProfileMenu {
     display: flex;
-    width: 200px;
     justify-content: center;
 
-    a{
+    a {
       text-decoration: none;
       font-weight: 800;
       color: #333;
       padding: 10px;
-    
+
       &:hover {
         color: #f0f0f0;
       }
     }
 
     &-Profile {
-      img{
+      img {
         border-radius: 50px;
         max-height: 40px;
         width: auto;
       }
     }
+
+    &-Links {
+      display: flex;
+      align-items: center;
+    }
+
+    &-Seperator {
+      margin: 0 5px;
+    }
   }
 }
-
-

@@ -6,26 +6,26 @@ import Profile from "./assets/Profile.png";
 
 const Login = false;
 function LoginStatus() {
-  if (Login == true) {
-    function LogedIn() {
-      return (
-        <div className="Header__ProfileMenu">
-          <Link to="/profile" className="Header__ProfileMenu-Profile">
-            <img src={Profile} alt="Profile" />
-          </Link>
-        </div>
-      );
-    }
-  } else if (Login == false) {
-    function LoginStatus() {
-      return (
-        <div className="Header__ProfileMenu">
-          <Link to="/login" className="Header__ProfileMenu-Login">
-            Login
-          </Link>
-        </div>
-      );
-    }
+  if (Login === true) {
+    return (
+      <div className="Header__ProfileMenu">
+        <Link to="/profile" className="Header__ProfileMenu-Profile">
+          <img src={Profile} alt="Profile" />
+        </Link>
+      </div>
+    );
+  } else {
+    return (
+      <div className="Header__ProfileMenu">
+        <Link to="/login" className="Header__ProfileMenu-Login">
+          Login
+        </Link>
+        <span className="Header__ProfileMenu-Seperator">/</span>
+        <Link to="/SignUp" className="Header__ProfileMenu-Signup">
+          Signup
+        </Link>
+      </div>
+    );
   }
 }
 

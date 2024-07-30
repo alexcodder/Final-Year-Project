@@ -41,7 +41,6 @@ a {
 }
 .Header__ProfileMenu {
   display: flex;
-  width: 200px;
   justify-content: center;
 }
 .Header__ProfileMenu a {
@@ -57,4 +56,11 @@ a {
   border-radius: 50px;
   max-height: 40px;
   width: auto;
+}
+.Header__ProfileMenu-Links {
+  display: flex;
+  align-items: center;
+}
+.Header__ProfileMenu-Seperator {
+  margin: 0 5px;
 }/*# sourceMappingURL=Style.css.map */

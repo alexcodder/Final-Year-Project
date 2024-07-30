@@ -7,6 +7,7 @@ import About from "./About.jsx";
 import Contact from "./Contact.jsx";
 import Location from "./Location.jsx";
 import Login from "./Login.jsx"; 
+import SignUp from "./signIn.jsx";
 import Profile from "./Profile.jsx"; 
 import "./index.css";
 import "./Style.scss";
@@ -21,6 +22,7 @@ function Main() {
         <Route path="/contact" element={<Contact />} />
         <Route path="/location" element={<Location />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<SignUp />} />
         <Route path="/profile" element={<Profile />} />
       </Routes>
     </Router>
