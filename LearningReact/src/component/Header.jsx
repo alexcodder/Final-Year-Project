@@ -1,12 +1,14 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import "./Style.scss";
-import logo from "./assets/Logo.svg";
-import Profile from "./assets/Profile.png";
+import "../stylesheet/Style.scss";
+import logo from "../assets/image/Logo.png";
+import Profile from "../assets/image/Profile.png";
+import { LoginStatus } from "./ConstantVariable";
 
-const Login = false;
-function LoginStatus() {
-  if (Login === true) {
+
+
+function Loginfilter() {
+  if (LoginStatus === true) {
     return (
       <div className="Header__ProfileMenu">
         <Link to="/profile" className="Header__ProfileMenu-Profile">
@@ -17,7 +19,7 @@ function LoginStatus() {
   } else {
     return (
       <div className="Header__ProfileMenu">
-        <Link to="/login" className="Header__ProfileMenu-Login">
+        <Link to="/login" className="Header__ProfileMenu-Login" >
           Login
         </Link>
         <span className="Header__ProfileMenu-Seperator">/</span>
@@ -45,7 +47,7 @@ function Header() {
         <Link to="/location">Location</Link>
       </div>
       <div className="Header__ProfileMenu">
-        <LoginStatus />
+        <Loginfilter />
       </div>
     </div>
   );

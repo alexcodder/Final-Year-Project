@@ -1,16 +1,17 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
-import Header from "./Header.jsx";
-import Index from "./Index.jsx"; 
-import About from "./About.jsx";
-import Contact from "./Contact.jsx";
-import Location from "./Location.jsx";
-import Login from "./Login.jsx"; 
-import SignUp from "./signIn.jsx";
-import Profile from "./Profile.jsx"; 
-import "./index.css";
-import "./Style.scss";
+import Header from "./component/Header.jsx";
+import Index from "./pages/Index.jsx"; 
+import About from "./pages/About.jsx";
+import Contact from "./pages/Contact.jsx";
+import Location from "./pages/Location.jsx";
+import Login from "./pages/Login.jsx"; 
+import SignUp from "./pages/signIn.jsx";
+import Profile from "./pages/Profile.jsx"; 
+import "./stylesheet/index.css";
+import "./stylesheet/Style.scss";
+
 
 function Main() {
   return (

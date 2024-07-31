@@ -1,10 +1,10 @@
 import React from "react";
-import "./Style.scss";
+import "../stylesheet/Style.scss";
 
 function Profile() {
   return (
     <div className="Profile">
-      <h1>Profile</h1>
+      <h1>SignUp</h1>
     </div>
   );
 }
