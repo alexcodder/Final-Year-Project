@@ -1,5 +1,5 @@
-## React Page for Hotel Shrestha
-# Possible final year project
-# Possible Website for my hotel
+# React Page for Hotel Shrestha
+### Possible final year project
+### Possible Website for my hotel
 
-# Header created 
+### Header created 
