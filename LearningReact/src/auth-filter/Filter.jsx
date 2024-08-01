@@ -24,6 +24,7 @@ function LoginFilter() {
         if (loginStatus) {
             return (
                 <div className="Header__ProfileMenu">
+                    <i className="far fa-bell fa-2x Notification" onClick={Notification}></i>
                     <Link to="/profile" className="Header__ProfileMenu-Profile">
                         <img src={Profile} alt="Profile" />
                     </Link>
