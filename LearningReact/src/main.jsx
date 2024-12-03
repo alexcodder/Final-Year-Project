@@ -1,4 +1,3 @@
-import React from "react";
 import ReactDOM from "react-dom/client";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import Header from "./component/Header.jsx";
@@ -16,7 +15,7 @@ import "./stylesheet/index.css";
 import "./stylesheet/Style.scss";
 
 
-function Main() {
+export function Main() {
   return (
     <Router>
       <Header />
@@ -30,7 +29,7 @@ function Main() {
         <Route path="/signup" element={<SignUp />} />
         <Route path="/profile" element={<Profile />} />
       </Routes>
-      <Footer />
+      <Footer />  
     </Router>
   );
 }
