@@ -2,6 +2,7 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import Header from "./component/Header.jsx";
+import Footer from "./component/Footer.jsx";
 // import Footer from "./component/Footer.jsx";
 import Index from "./pages/Index.jsx"; 
 import About from "./pages/About.jsx";
@@ -20,7 +21,8 @@ function Main() {
     <Router>
       <Header />
       <Routes>
-        <Route path="/Index" element={<Index />} />
+        <Route path="/" element={<Index />} />
+        <Route path="/home" element={<Index />} />
         <Route path="/about" element={<About />} />
         <Route path="/contact" element={<Contact />} />
         <Route path="/location" element={<Location />} />
@@ -28,7 +30,7 @@ function Main() {
         <Route path="/signup" element={<SignUp />} />
         <Route path="/profile" element={<Profile />} />
       </Routes>
-      {/* <Footer /> */}
+      <Footer />
     </Router>
   );
 }

@@ -4,6 +4,10 @@
   padding: 0px;
 }
 
+.container {
+  margin: 0 5%;
+}
+
 a {
   text-decoration: none;
 }
@@ -17,18 +21,23 @@ a {
 }
 .Header__Logo {
   display: flex;
-  align-items: center;
   justify-content: space-between;
-  width: 300px;
+  width: 430px;
+  align-items: baseline;
 }
 .Header__Logo img {
-  height: 50px;
+  height: 60px;
+}
+.Header__Logo a:active, .Header__Logo a:focus {
+  color: inherit;
+  outline: none;
 }
 .Header__Menu {
   display: flex;
-  justify-content: space-between;
+  justify-content: space-around;
   align-items: center;
   width: 500px;
+  font-size: 1.5em;
 }
 .Header__Menu a {
   text-decoration: none;
@@ -42,6 +51,7 @@ a {
 .Header__ProfileMenu {
   display: flex;
   justify-content: center;
+  align-items: center;
 }
 .Header__ProfileMenu a {
   text-decoration: none;
