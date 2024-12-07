@@ -8,7 +8,7 @@ import About from "./pages/About.jsx";
 import Contact from "./pages/Contact.jsx";
 import Location from "./pages/Location.jsx";
 import Login from "./pages/Login.jsx"; 
-import SignUp from "./pages/signIn.jsx";
+import SignUp from "./pages/signUp.jsx";
 import Profile from "./pages/Profile.jsx"; 
 import "./component/ConstantVariable.jsx";
 import "./stylesheet/index.css";

@@ -1,28 +1,23 @@
-import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
 import "../stylesheet/Style.scss";
-import logo from "../assets/image/Logo.png";
-import LoginFilter from "../auth-filter/Filter";
 
 const Footer = () => {
   return (
-    <div className="Header">
-      <Link to="/home">
-        <div className="Header__Logo">
-          <img src={logo} alt="Logo" />
+    <footer className="footer">
+      <div className="footer__content">
+        <div className="footer__logo">
           <h4>Hotel Shrestha</h4>
         </div>
-      </Link>
-      <div className="Header__Menu">
-        <Link to="/home">Home</Link>
-        <Link to="/about">About</Link>
-        <Link to="/contact">Contact</Link>
-        <Link to="/location">Location</Link>
+
+        <div className="footer__contact">
+          <p>Phone: +123 456 789</p>
+          <p>Email: contact@hotelshrestha.com</p>
+        </div>
       </div>
-      <div className="Header__ProfileMenu">
-        < LoginFilter />
+
+      <div className="footer__bottom">
+        <p>&copy; 2024 Hotel Shrestha. All rights reserved.</p>
       </div>
-    </div>
+    </footer>
   );
 };
 

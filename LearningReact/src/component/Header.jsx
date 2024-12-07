@@ -1,6 +1,5 @@
-import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import "../stylesheet/Style.scss";
+import "../stylesheet/Header.scss";
 import logo from "../assets/image/Logo.png";
 import LoginFilter from "../auth-filter/Filter";
 

@@ -1,5 +1,5 @@
 import { user } from "../component/ConstantVariable";
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import Profile from "../assets/image/Profile.png";
 

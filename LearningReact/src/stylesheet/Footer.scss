@@ -1,0 +1,43 @@
+.footer {
+    background-color: #c6b9ff;  // Matches the Header background color
+    color: #2f2744;  // Dark text color, consistent with header text
+    padding: 40px 20px;
+    font-size: 1rem;
+  
+    &__content {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      max-width: 1200px;
+      margin: 0 auto;
+      gap: 30px;
+    }
+  
+    &__logo {
+      h4 {
+        font-size: 1.6rem;
+        color: #2f2744;
+        font-weight: bold;
+      }
+    }
+  
+    &__contact {
+      p {
+        margin: 5px 0;
+        color: #333;
+      }
+    }
+  
+    &__bottom {
+      text-align: center;
+      margin-top: 20px;
+      font-size: 0.9rem;
+      color: #555;
+  
+      p {
+        margin: 0;
+      }
+    }
+  }
+  
