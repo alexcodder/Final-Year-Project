@@ -19,6 +19,7 @@
     "dotenv": "^16.4.7",
     "glob": "^11.0.0",
     "google": "^2.1.0",
+    "jsonwebtoken": "^9.0.2",
     "lru-cache": "^11.0.0",
     "maps": "^0.3.3",
     "prop-types": "^15.8.1",

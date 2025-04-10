@@ -21,32 +21,44 @@ const Signup = async (req, res) => {
     }
 }
 
-//Login
+//Login Api
+const jwt = require('jsonwebtoken');
 const Login = async (req, res) => {
     try {
-        console.log("Received login request:", req.body); 
+        console.log("Received login request:", req.body); //debugging line
     
         const { username, password } = req.body;
     
         if (!username || !password) {
-            console.log("Missing username or password");
             return res.status(400).json({ message: "Username and password are required" });
         }
     
         const user = await Users.findOne({ username });
     
         if (!user) {
-            console.log("User not found");
+            console.log("User not found"); //debugging line
             return res.status(404).json({ message: "User not found" });
         }
     
         const isMatch = await bcrypt.compare(password, user.password);
     
         if (!isMatch) {
-            console.log("Invalid credentials");
-            return res.status(400).json({ message: "Invalid credentials" });
+            console.log("Wrong Password"); //debugging line
+            return res.status(400).json({ message: "Wrong Password" });
         }
     
+        const cookieExpiresInDays = parseInt(process.env.JWT_COOKIE_EXPIRES_IN); // Ensure this is a number
+        const cookieMaxAge = cookieExpiresInDays * 24 * 60 * 60 * 1000; // Convert days to milliseconds
+
+        const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXPIRES_IN });
+
+        res.cookie('jwt', token, {
+            httpOnly: process.env.JWT_COOKIE_HTTP_ONLY === 'true',
+            secure: process.env.JWT_COOKIE_SECURE === 'true',
+            maxAge: cookieMaxAge,
+            sameSite: process.env.JWT_COOKIE_SAME_SITE === 'true' ? 'Strict' : 'Lax',
+        });
+
         res.status(200).json({
             userId: user._id,
             role: user.role,

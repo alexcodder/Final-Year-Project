@@ -3,14 +3,18 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
 function Login() {
+  // State to manage login data
   const [loginData, setLoginData] = useState({
     username: "",
     password: "",
   });
 
+  // State to manage login status
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  // useNavigate hook to programmatically navigate
   const navigate = useNavigate();
 
+  // Function to handle input changes
   function handleChange(e) {
     const { name, value } = e.target;
     setLoginData((prevState) => ({
@@ -22,13 +26,15 @@ function Login() {
   async function handleSubmit(e) {
     e.preventDefault();
     try {
+      // Sending login data to the server
       const response = await axios.post("http://localhost:3001/api/v1/auth/login", loginData, {
         headers: { "Content-Type": "application/json" },
       });
 
       // Storing user data in localStorage
-      localStorage.setItem("userId", response.data.userId);
+      localStorage.setItem("token", response.data.token);
       localStorage.setItem("role", response.data.role);
+      localStorage.setItem("userId", response.data.userId);
 
       setIsLoggedIn(true);
 
@@ -54,7 +60,7 @@ function Login() {
             break;
     }
     } catch (error) {
-      console.error("Login Error:", error);
+      console.error("Login Error:", error); // Debugging line
       alert("Invalid Username or password");
     }
   }
