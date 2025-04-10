@@ -9,21 +9,20 @@ function UserCheck() {
 }
 
 function LoginFilter() {
-    const [loginStatus, setLoginStatus] = useState(false);
+    const [loginStatus, setLoginStatus] = useState(UserCheck());
     const navigate = useNavigate(); 
 
     useEffect(() => {
-        const handleStorageChange = () => {
-            setLoginStatus(UserCheck());
-        };
-
+        // Check login status immediately
         setLoginStatus(UserCheck());
 
-        window.addEventListener("storage", handleStorageChange);
+        // Create an interval to check login status periodically
+        const checkInterval = setInterval(() => {
+            setLoginStatus(UserCheck());
+        }, 1000);
 
-        return () => {
-            window.removeEventListener("storage", handleStorageChange);
-        };
+        // Cleanup interval on unmount
+        return () => clearInterval(checkInterval);
     }, []);
 
     function handleLogout() {

@@ -1,11 +1,11 @@
 import React from "react";
 
-function Location() {
+function Hospital() {
   return (
-    <div className="Location">
-      <h1>Map</h1>
+    <div className="Hospital">
+      <h1>Hospital</h1>
     </div>
   );
 }
 
-export default Location;
+export default Hospital;
