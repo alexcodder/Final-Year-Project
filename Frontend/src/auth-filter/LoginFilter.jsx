@@ -17,46 +17,51 @@ function LoginFilter() {
         setLoginStatus(UserCheck());
 
         // Create an interval to check login status periodically
-        const checkInterval = setInterval(() => {
+        const interval = setInterval(() => {
             setLoginStatus(UserCheck());
         }, 1000);
 
-        // Cleanup interval on unmount
-        return () => clearInterval(checkInterval);
+        // Cleanup interval on component unmount
+        return () => clearInterval(interval);
     }, []);
 
-    function handleLogout() {
-        localStorage.removeItem("userId");
+    const handleLogout = () => {
+        localStorage.removeItem("token");
         localStorage.removeItem("role");
+        localStorage.removeItem("userId");
         setLoginStatus(false);
-        navigate("/login"); 
+        navigate("/login");
+    };
+
+    if (loginStatus) {
+        return (
+            <div className="auth-buttons">
+                <button className="auth-button notification">
+                    <i className="far fa-bell"></i>
+                </button>
+                <Link to="/profile" className="auth-button profile">
+                    <img src={Profile} alt="Profile" />
+                </Link>
+                <button onClick={handleLogout} className="auth-button logout">
+                    <i className="fas fa-sign-out-alt"></i>
+                    <span>Logout</span>
+                </button>
+            </div>
+        );
     }
 
-    function Loginfilter() {
-        if (loginStatus) {
-            return (
-                <div className="Header__ProfileMenu">
-                    <i className="far fa-bell fa-2x Notification" onClick={Notification}></i>
-                    <Link to="/profile" className="Header__ProfileMenu-Profile">
-                        <img src={Profile} alt="Profile" />
-                    </Link>
-                </div>
-            );
-        } else {
-            return (
-                <div className="Header__ProfileMenu">
-                    <Link to="/login" className="Header__ProfileMenu-Login">
-                        Login
-                    </Link>
-                    <Link to="/SignUp" className="Header__ProfileMenu-Signup">
-                        Signup
-                    </Link>
-                </div>
-            );
-        }
-    }
-
-    return Loginfilter();
+    return (
+        <div className="auth-buttons">
+            <Link to="/login" className="auth-button login">
+                <i className="fas fa-sign-in-alt"></i>
+                <span>Login</span>
+            </Link>
+            <Link to="/signup" className="auth-button signup">
+                <i className="fas fa-user-plus"></i>
+                <span>Sign Up</span>
+            </Link>
+        </div>
+    );
 }
 
 export default LoginFilter;
