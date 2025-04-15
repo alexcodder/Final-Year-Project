@@ -3,21 +3,38 @@ require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
-const Router = require('./Routes/UserRouter.js');
+const cookieParser = require('cookie-parser');
+const userRouter = require('./routes/userRoutes');
+const authRouter = require('./Routes/authRouter');
+
+// Create Express app
 const app = express();
 
-// Connect to MongoDB
-mongoose.connect(process.env.MONGO_URI_USER) // URL from .env file
-  .then(() => console.log("Connected to MongoDB"))
-  .catch((error) => console.log("Error connecting to MongoDB:", error)
-);
+// CORS configuration
+const corsOptions = {
+  origin: 'http://localhost:5173', // Your frontend URL
+  credentials: true, // Allow credentials (cookies, authorization headers, etc.)
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'Cookie', 'Accept']
+};
 
 // Middleware
+app.use(cors(corsOptions));
 app.use(express.json());
-app.use(cors());
-app.use(express.urlencoded({ extended: true })); // For parsing application/x-www-form-urlencoded
-app.use(express.json()); // For parsing application/json
-app.use('/api/v1/auth', Router); // Use the router for authentication routes 
+app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
+
+// Add logging middleware for debugging
+app.use((req, res, next) => {
+  console.log(`${req.method} ${req.url}`);
+  console.log('Cookies:', req.cookies);
+  console.log('Headers:', req.headers);
+  next();
+});
+
+// Routes
+app.use('/api/v1/users', userRouter);
+app.use('/api/v1/auth', authRouter);
 
 // Error handling middleware
 app.use((err, req, res, next) => {
@@ -25,25 +42,59 @@ app.use((err, req, res, next) => {
   res.status(500).json({ message: 'Something went wrong!' });
 });
 
-// Start the server
-const server = app.listen(process.env.PORT, () => {
-  console.log('Server is running on port 3001');
-});
+// Connect to MongoDB
+const connectDB = async () => {
+  try {
+    await mongoose.connect(process.env.MONGO_URI_USER);
+    console.log('Connected to MongoDB');
 
-// shutdown mongoDB and express server
-const shutdown = () => {
-  server.close(() => {
-    console.log('Server closed');
-    mongoose.connection.close(false, () => {
-      console.log('MongoDB connection closed');
-      process.exit(0);
+    // Start server only after successful MongoDB connection
+    const PORT = process.env.PORT || 5000;
+    app.listen(PORT, () => {
+      console.log(`Server running on port ${PORT}`);
     });
-  });
+  } catch (error) {
+    console.error('MongoDB connection error:', error);
+    process.exit(1);
+  }
 };
 
-process.on('SIGINT', shutdown); // Listen for Ctrl+C (SIGINT)
-process.on('SIGTERM', shutdown); // Listen for termination signal (SIGTERM)
-process.on('uncaughtException', (error) => {
-  console.error('Uncaught Exception:', error);
-  shutdown();
+// Handle MongoDB connection events
+mongoose.connection.on('connected', () => {
+  console.log('Mongoose connected to DB');
+});
+
+mongoose.connection.on('error', (err) => {
+  console.error('Mongoose connection error:', err);
+});
+
+mongoose.connection.on('disconnected', () => {
+  console.log('Mongoose disconnected from DB');
+});
+
+// Handle process termination
+process.on('SIGINT', async () => {
+  try {
+    await mongoose.connection.close();
+    console.log('MongoDB connection closed through app termination');
+    process.exit(0);
+  } catch (err) {
+    console.error('Error during app termination:', err);
+    process.exit(1);
+  }
+});
+
+// Start the application
+connectDB();
+
+// Handle unhandled promise rejections
+process.on('unhandledRejection', (err) => {
+  console.error('Unhandled Promise Rejection:', err);
+  process.exit(1);
+});
+
+// Handle uncaught exceptions
+process.on('uncaughtException', (err) => {
+  console.error('Uncaught Exception:', err);
+  process.exit(1);
 });
