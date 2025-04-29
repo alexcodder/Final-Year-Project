@@ -1,8 +1,8 @@
-const { Register, Users } = require('../models/UserModel');
+const { Users } = require('../models/UserModel');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
-// Helper function for error responses
+// error responses
 const sendErrorResponse = (res, status, message, error = null) => {
     console.error(message, error ? error : '');
     return res.status(status).json({
@@ -15,17 +15,17 @@ const sendErrorResponse = (res, status, message, error = null) => {
 // Signup
 const Signup = async (req, res) => {
     try {
-        const { username, email, password, role } = req.body;
+        const { name, email, username, password, role } = req.body;
 
         // Validate required fields
-        if (!username || !email || !password || !role) {
+        if (!name || !email || !username || !password || !role) {
             return sendErrorResponse(res, 400, "All fields are required");
         }
 
-        // Validate email format
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!emailRegex.test(email)) {
-            return sendErrorResponse(res, 400, "Invalid email format");
+        // Validate role
+        const validRoles = ['patient', 'ambulance', 'hospital', 'bloodbank'];
+        if (!validRoles.includes(role.toLowerCase())) {
+            return sendErrorResponse(res, 400, "Invalid role selected");
         }
 
         // Check for duplicate email
@@ -40,32 +40,47 @@ const Signup = async (req, res) => {
             return sendErrorResponse(res, 400, "Username already exists");
         }
 
-        // Hash password
-        const salt = await bcrypt.genSalt(10);
-        const hashedPassword = await bcrypt.hash(password, salt);
-
         const userData = {
+            name,
             username: username.toLowerCase(),
             email: email.toLowerCase(),
-            password: hashedPassword,
+            password: password,
             role: role.toLowerCase()
         };
 
-        // Create user in both collections
-        const registerUser = new Register(userData);
-        const usersUser = new Users(userData);
+        // Create user
+        const user = new Users(userData);
+        await user.save();
 
-        await registerUser.save();
-        await usersUser.save();
+        // Generate token
+        const token = jwt.sign(
+            { 
+                id: user._id,
+                role: user.role,
+                username: user.username
+            }, 
+            process.env.JWT_SECRET, 
+            { expiresIn: process.env.JWT_EXPIRES_IN }
+        );
+
+        // Set cookie
+        res.cookie('token', token, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'strict',
+            maxAge: 24 * 60 * 60 * 1000 // 24 hours
+        });
 
         res.status(201).json({
             success: true,
             message: "User created successfully",
+            token: token,
             user: {
-                id: registerUser._id,
-                username: registerUser.username,
-                email: registerUser.email,
-                role: registerUser.role
+                id: user._id,
+                name: user.name,
+                username: user.username,
+                email: user.email,
+                role: user.role
             }
         });
     } catch (error) {
@@ -78,13 +93,13 @@ const Login = async (req, res) => {
     try {
         const { username, password } = req.body;
 
-        // Validate input
         if (!username || !password) {
             return sendErrorResponse(res, 400, "Username and password are required");
         }
-
-        // Find user in Users collection
+    
+        // Find user
         const user = await Users.findOne({ username: username.toLowerCase() });
+    
         if (!user) {
             return sendErrorResponse(res, 401, "Invalid credentials");
         }
@@ -94,55 +109,32 @@ const Login = async (req, res) => {
         if (!isMatch) {
             return sendErrorResponse(res, 401, "Invalid credentials");
         }
-
-        // Also find user in Register collection to make sure we have the right records
-        const registerUser = await Register.findOne({ username: username.toLowerCase() });
-        
-        // Use the correct user object for ID
-        const userId = registerUser ? registerUser._id : user._id;
         
         // Generate token
         const token = jwt.sign(
-            {
-                id: userId,
+            { 
+                id: user._id,
                 role: user.role,
                 username: user.username
-            },
-            process.env.JWT_SECRET,
+            }, 
+            process.env.JWT_SECRET, 
             { expiresIn: process.env.JWT_EXPIRES_IN }
         );
 
-        // Log token details for debugging
-        console.log('Generated token:', {
-            payload: {
-                id: userId,
-                role: user.role,
-                username: user.username
-            },
-            expiresIn: process.env.JWT_EXPIRES_IN
-        });
-
-        // Set cookie with 1 minute expiration
-        const oneMinuteFromNow = new Date(Date.now() + 60 * 1000); // Current time + 1 minute
-        
-        // Enhanced cookie settings for development environment
-        res.cookie('jwt', token, {
+        // Set cookie
+        res.cookie('token', token, {
             httpOnly: true,
-            secure: false, // Must be false for non-HTTPS localhost
-            expires: oneMinuteFromNow,
-            sameSite: 'Lax', // Using 'Lax' for development environment
-            path: '/'
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'strict',
+            maxAge: 24 * 60 * 60 * 1000 // 24 hours
         });
 
-        // DEBUGGING: Log the Set-Cookie header
-        console.log('Set-Cookie Header:', res.getHeader('Set-Cookie'));
-
-        // Send response
-        res.status(200).json({
+        res.json({
             success: true,
             message: "Login successful",
+            token: token,
             user: {
-                id: userId,
+                id: user._id,
                 username: user.username,
                 role: user.role,
                 email: user.email
@@ -156,8 +148,8 @@ const Login = async (req, res) => {
 // Get all users
 const getUsers = async (req, res) => {
     try {
-        const users = await Users.find({}, '-password').sort({ username: 1 });
-        res.status(200).json({
+        const users = await Users.find().select('-password').sort({ username: 1 });
+        res.json({
             success: true,
             count: users.length,
             data: users
@@ -170,11 +162,11 @@ const getUsers = async (req, res) => {
 // Get user by ID
 const getUserById = async (req, res) => {
     try {
-        const user = await Users.findById(req.params.id, '-password');
+        const user = await Users.findById(req.params.id).select('-password');
         if (!user) {
             return sendErrorResponse(res, 404, "User not found");
         }
-        res.status(200).json({
+        res.json({
             success: true,
             data: user
         });
@@ -227,7 +219,7 @@ const updateUser = async (req, res) => {
             return sendErrorResponse(res, 404, "User not found");
         }
 
-        res.status(200).json({
+        res.json({
             success: true,
             message: "User updated successfully",
             data: user
@@ -245,9 +237,7 @@ const deleteUser = async (req, res) => {
             return sendErrorResponse(res, 404, "User not found");
         }
 
-        // Delete from both collections
         await Users.findByIdAndDelete(req.params.id);
-        await Register.findOneAndDelete({ email: user.email });
 
         res.status(200).json({
             success: true,
@@ -261,16 +251,13 @@ const deleteUser = async (req, res) => {
 // Logout
 const Logout = (req, res) => {
     try {
-        // Clear the JWT cookie by setting an expired date
         res.cookie('jwt', '', {
             httpOnly: true,
-            expires: new Date(0), // Set expiration to epoch time
-            secure: false,
-            sameSite: 'Lax',
-            path: '/' // Important for proper cookie removal
+            expires: new Date(0),
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'Strict'
         });
 
-        // Send success response
         res.status(200).json({
             success: true,
             message: 'Logged out successfully'

@@ -1,7 +1,7 @@
 // Header.jsx
 import { Link } from "react-router-dom";
-import logo from "../assets/image/Logo.png";
-import LoginFilter from "../auth-filter/LoginFilter"; // Your custom login filter component
+import logo from "../../assets/image/Logo.png";
+import LoginFilter from "../../auth-filter/LoginFilter"; // Your custom login filter component
 
 const Header = () => {
   return (

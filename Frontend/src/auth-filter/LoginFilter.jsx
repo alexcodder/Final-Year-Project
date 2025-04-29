@@ -29,6 +29,7 @@ function LoginFilter() {
         localStorage.removeItem("token");
         localStorage.removeItem("role");
         localStorage.removeItem("userId");
+        localStorage.removeItem("username");
         setLoginStatus(false);
         navigate("/login");
     };

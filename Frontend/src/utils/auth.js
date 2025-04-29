@@ -12,20 +12,46 @@ const api = axios.create({
   withCredentials: true
 });
 
+// Set token in axios defaults and localStorage
+export const setAuthToken = (token) => {
+  if (token) {
+    // Remove any whitespace and ensure proper Bearer format
+    const formattedToken = token.trim();
+    const bearerToken = formattedToken.startsWith('Bearer ') ? formattedToken : `Bearer ${formattedToken}`;
+    
+    // Set in axios defaults
+    axios.defaults.headers.common['Authorization'] = bearerToken;
+    
+    // Store in localStorage
+    localStorage.setItem('token', formattedToken);
+    
+    console.log('Token set successfully:', bearerToken);
+  } else {
+    // Remove token from axios defaults and localStorage
+    delete axios.defaults.headers.common['Authorization'];
+    localStorage.removeItem('token');
+    console.log('Token cleared');
+  }
+};
+
 // Clear all auth-related data from the browser
 export const clearAuthData = () => {
   // Clear localStorage items
   localStorage.removeItem('userId');
   localStorage.removeItem('role');
   localStorage.removeItem('username');
+  localStorage.removeItem('token');
   
-  // Clear JWT cookie
-  document.cookie = "jwt=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+  // Clear axios defaults
+  delete axios.defaults.headers.common['Authorization'];
+  
+  console.log('Auth data cleared');
 };
 
 // Check if user is authenticated
 export const isAuthenticated = () => {
-  return !!localStorage.getItem('userId');
+  const token = localStorage.getItem('token');
+  return !!token;
 };
 
 // Server-side logout
@@ -59,4 +85,6 @@ export const getUserRole = () => {
 // Get username
 export const getUsername = () => {
   return localStorage.getItem('username') || 'User';
-}; 
+};
+
+export default api; 

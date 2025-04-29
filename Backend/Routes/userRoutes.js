@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { Register } = require('../models/UserModel');
+const { Users } = require('../models/UserModel');
 const authMiddleware = require('../middleware/authMiddleware');
 
 // Get all users (admin only)
@@ -14,7 +14,7 @@ router.get('/', authMiddleware, async (req, res) => {
       });
     }
 
-    const users = await Register.find().select('-password');
+    const users = await Users.find().select('-password');
     res.json({
       success: true,
       data: users
@@ -35,7 +35,7 @@ router.get('/check-auth', authMiddleware, async (req, res) => {
     // req.user is set by the authMiddleware
     res.json({
       success: true,
-      message: "User is authenticated",
+      message: "Users is authenticated",
       user: {
         id: req.user._id,
         username: req.user.username,
@@ -55,12 +55,12 @@ router.get('/check-auth', authMiddleware, async (req, res) => {
 // Get single user
 router.get('/:id', authMiddleware, async (req, res) => {
   try {
-    const user = await Register.findById(req.params.id).select('-password');
+    const user = await Users.findById(req.params.id).select('-password');
     
     if (!user) {
       return res.status(404).json({
         success: false,
-        message: 'User not found'
+        message: 'Users not found'
       });
     }
 
@@ -88,7 +88,7 @@ router.put('/:id', authMiddleware, async (req, res) => {
       });
     }
 
-    const user = await Register.findByIdAndUpdate(
+    const user = await Users.findByIdAndUpdate(
       req.params.id,
       req.body,
       { new: true, runValidators: true }
@@ -97,7 +97,7 @@ router.put('/:id', authMiddleware, async (req, res) => {
     if (!user) {
       return res.status(404).json({
         success: false,
-        message: 'User not found'
+        message: 'Users not found'
       });
     }
 
@@ -125,18 +125,18 @@ router.delete('/:id', authMiddleware, async (req, res) => {
       });
     }
 
-    const user = await Register.findByIdAndDelete(req.params.id);
+    const user = await Users.findByIdAndDelete(req.params.id);
 
     if (!user) {
       return res.status(404).json({
         success: false,
-        message: 'User not found'
+        message: 'Users not found'
       });
     }
 
     res.json({
       success: true,
-      message: 'User deleted successfully'
+      message: 'Users deleted successfully'
     });
   } catch (error) {
     console.error('Delete user error:', error);

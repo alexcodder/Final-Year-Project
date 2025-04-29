@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import axios from "axios";
+import { setAuthToken } from '../utils/auth';
 
 function SignUp() {
   const [registerData, setRegisterData] = useState({
@@ -32,42 +33,45 @@ function SignUp() {
     }
   }
 
-  async function handleSignUp(e) {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setError('');
     setIsLoading(true);
-    setError("");
-
-    if (registerData.password !== registerData.confirmPassword) {
-      setError("Passwords do not match!");
-      setIsLoading(false);
-      return;
-    }
 
     try {
-      const response = await axios.post("http://localhost:3001/api/v1/auth/signup", registerData);
-      console.log("Signup Success:", response.data);
+      const response = await axios.post('http://localhost:3001/api/v1/auth/signup', {
+        username: registerData.username,
+        email: registerData.email,
+        password: registerData.password,
+        role: registerData.role
+      }, {
+        withCredentials: true
+      });
 
-      switch (registerData.role) {
-        case "ambulance":
-          navigate("/dashboard/ambulance");
-          break;
-        case "hospital":
-          navigate("/dashboard/hospital");
-          break;
-        case "bloodbank":
-          navigate("/dashboard/bloodbank");
-          break;
-        case "patient":
-        default:
-          navigate("/PatientForm");
-          break;
+      if (response.data.success) {
+        // Store user data
+        localStorage.setItem('userId', response.data.userId);
+        localStorage.setItem('role', response.data.role);
+        localStorage.setItem('username', response.data.username);
+        localStorage.setItem('name', response.data.name);
+        localStorage.setItem('email', response.data.email);
+        
+        // Set the token using the new utility function
+        setAuthToken(response.data.token);
+        
+        // Redirect based on role
+        if (response.data.role === 'admin') {
+          navigate('/admin-dashboard');
+        } else {
+          navigate('/dashboard');
+        }
       }
-    } catch (error) {
-      setError(error.response?.data?.message || "Signup failed. Please try again.");
+    } catch (err) {
+      setError(err.response?.data?.message || 'Signup failed. Please try again.');
     } finally {
       setIsLoading(false);
     }
-  }
+  };
 
   return (
     <div className="signup-container">
@@ -77,7 +81,7 @@ function SignUp() {
           <p>Join our healthcare network today</p>
         </div>
 
-        <form className="signup-form" onSubmit={handleSignUp}>
+        <form className="signup-form" onSubmit={handleSubmit}>
           <div className="form-group">
             <label htmlFor="name">
               <i className="fas fa-user"></i>

@@ -11,9 +11,23 @@ function Login() {
 
   // State to manage login status
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState("");
-  // useNavigate hook to programmatically navigate
+  const [error, setError] = useState('');
+  
   const navigate = useNavigate();
+
+  const validateForm = () => {
+    const newErrors = {};
+    
+    if (!loginData.username) {
+      newErrors.username = "Username is required";
+    }
+
+    if (!loginData.password) {
+      newErrors.password = "Password is required";
+    }
+
+    return Object.keys(newErrors).length === 0;
+  };
 
   // Function to handle input changes
   function handleChange(e) {
@@ -22,17 +36,21 @@ function Login() {
       ...prevState,
       [name]: value,
     }));
-    setError(""); // Clear error when user types
+    // Clear error when user starts typing
+    setError('');
   }
 
   async function handleSubmit(e) {
     e.preventDefault();
+    setError('');
     setIsLoading(true);
-    setError("");
+
+    if (!validateForm()) {
+      setIsLoading(false);
+      return;
+    }
 
     try {
-      console.log("Attempting login with:", { ...loginData, password: "[REDACTED]" });
-      
       const response = await axios.post(
         "http://localhost:3001/api/v1/auth/login",
         loginData,
@@ -45,15 +63,47 @@ function Login() {
         }
       );
 
-      console.log("Login response:", response.data);
-
       if (response.data.success) {
-        // Store user data from the correct format in the response
+        // If user is a patient, check for patient history
+        if (response.data.user.role === "patient") {
+          try {
+            const historyResponse = await axios.get(
+              "http://localhost:3001/api/v1/patient-history/history",
+              {
+                headers: {
+                  'Authorization': `Bearer ${response.data.token}`,
+                  'Content-Type': 'application/json'
+                },
+                withCredentials: true
+              }
+            );
+
+            localStorage.setItem("tempUserId", response.data.user.id);
+            localStorage.setItem("tempToken", response.data.token);
+            localStorage.setItem("tempUsername", response.data.user.username);
+            
+            // If no history data or empty history
+            if (!historyResponse.data.success || !historyResponse.data.data) {
+              // Redirect to patient history form
+              navigate("/patienthistoryform");
+              return;
+            }
+          } catch (error) {
+            console.error("History check error:", error);
+            navigate("/patienthistoryform");
+            return;
+          }
+        }
+            
+        // Store user data in localStorage
         localStorage.setItem("userId", response.data.user.id);
         localStorage.setItem("role", response.data.user.role);
         localStorage.setItem("username", response.data.user.username);
+        localStorage.setItem("token", response.data.token);
 
-        console.log("User data stored, redirecting...");
+        // Set default axios headers
+        axios.defaults.headers.common['Authorization'] = `Bearer ${response.data.token}`;
+        axios.defaults.withCredentials = true;
 
         // Redirect based on role
         switch (response.data.user.role) {
@@ -64,31 +114,39 @@ function Login() {
             navigate("/home");
             break;
           case "ambulance":
+            navigate("/ambulance-dashboard");
+            break;
           case "hospital":
+            navigate("/hospital-dashboard");
+            break;
           case "bloodbank":
-            navigate("/admin-dashboard"); // Send non-patient users to dashboard
+            navigate("/bloodbank-dashboard");
             break;
           default:
             navigate("/home");
             break;
         }
-      } else {
-        setError("Login failed. Please try again.");
       }
     } catch (error) {
       console.error("Login error:", error);
-      console.error("Error response:", error.response);
       
+      // Handle specific error cases
       if (error.response) {
-        // The request was made and the server responded with a status code
-        // that falls out of the range of 2xx
-        setError(error.response.data.message || "Login failed. Please check your credentials.");
-      } else if (error.request) {
-        // The request was made but no response was received
-        setError("No response from server. Please check your connection.");
+        switch (error.response.status) {
+          case 401:
+            setError("Invalid username or password");
+            break;
+          case 404:
+            setError("User not found");
+            break;
+          case 500:
+            setError("Server error. Please try again later");
+            break;
+          default:
+            setError(error.response.data.message || "Login failed. Please try again");
+        }
       } else {
-        // Something happened in setting up the request that triggered an Error
-        setError("An error occurred. Please try again.");
+        setError("Network error. Please check your connection");
       }
     } finally {
       setIsLoading(false);
@@ -102,6 +160,12 @@ function Login() {
           <h1>Welcome Back</h1>
           <p>Sign in to access your account</p>
         </div>
+
+        {error && (
+          <div className="error-message">
+            {error}
+          </div>
+        )}
 
         <form className="login-form" onSubmit={handleSubmit}>
           <div className="form-group">
@@ -137,8 +201,6 @@ function Login() {
               autoComplete="current-password"
             />
           </div>
-
-          {error && <div className="error-message">{error}</div>}
 
           <button 
             type="submit" 
