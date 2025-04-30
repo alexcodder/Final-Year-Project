@@ -1,0 +1,88 @@
+// Variables
+$primary: #1976d2;
+$secondary: #e3f2fd;
+$accent: #1565c0;
+$white: #fff;
+$border-radius: 12px;
+$shadow: 0 2px 8px rgba(25, 118, 210, 0.08);
+
+.blood-page {
+  background: $secondary;
+  min-height: 100vh;
+  padding: 2rem 0;
+
+  &__title {
+    color: $primary;
+    font-size: 2.2rem;
+    font-weight: 700;
+    margin-bottom: 2rem;
+    letter-spacing: 0.5px;
+  }
+
+  &__filters {
+    background: $white;
+    border-radius: $border-radius;
+    box-shadow: $shadow;
+    padding: 2rem 1.5rem;
+    margin-bottom: 2rem;
+  }
+
+  &__table-card {
+    background: $white;
+    border-radius: $border-radius;
+    box-shadow: $shadow;
+    padding: 2rem 1.5rem;
+  }
+
+  .blood-table {
+    width: 100%;
+    border-collapse: collapse;
+    th, td {
+      padding: 0.8rem 1rem;
+      text-align: left;
+      border-bottom: 1px solid #e0e0e0;
+    }
+    th {
+      background: $primary;
+      color: $white;
+      font-weight: 600;
+      font-size: 1.05rem;
+    }
+    tr:last-child td {
+      border-bottom: none;
+    }
+    tr {
+      transition: background 0.2s;
+      &:hover {
+        background: $secondary;
+      }
+    }
+  }
+
+  .blood-map-btn {
+    padding: 8px 16px;
+    background: $accent;
+    color: $white;
+    border: none;
+    border-radius: $border-radius;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: $shadow;
+    transition: background 0.2s, transform 0.2s;
+    &:hover {
+      background: $primary;
+      transform: translateY(-2px) scale(1.03);
+    }
+  }
+}
+
+// Responsive design
+@media (max-width: 900px) {
+  .blood-page__filters, .blood-page__table-card {
+    padding: 1rem 0.5rem;
+  }
+  .blood-page__title {
+    font-size: 1.5rem;
+  }
+} 

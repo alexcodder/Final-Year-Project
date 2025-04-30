@@ -1,0 +1,144 @@
+// Variables
+$primary: #0077b6;
+$secondary: #caf0f8;
+$accent: #00b4d8;
+$white: #fff;
+$border-radius: 16px;
+$shadow: 0 4px 24px rgba(0,0,0,0.08);
+$transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
+
+.hospital-page {
+  padding: 20px;
+
+  .hospital-title {
+    margin-bottom: 20px;
+    color: #333;
+  }
+
+  .hospital-map-btn {
+    margin-bottom: 20px;
+    padding: 8px 16px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+
+    &:hover {
+      background-color: #45a049;
+    }
+  }
+
+  .hospital-loading {
+    text-align: center;
+    padding: 20px;
+    color: #666;
+  }
+
+  .hospital-error {
+    color: #f44336;
+    padding: 20px;
+    text-align: center;
+  }
+
+  .hospital-table-wrapper {
+    overflow-x: auto;
+  }
+
+  .hospital-table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: white;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+
+    th, td {
+      padding: 12px;
+      text-align: left;
+      border-bottom: 1px solid #ddd;
+    }
+
+    th {
+      background-color: #f5f5f5;
+      font-weight: 600;
+    }
+
+    tr:hover {
+      background-color: #f9f9f9;
+    }
+
+    .status {
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 0.9em;
+      
+      &.available {
+        background-color: #e8f5e9;
+        color: #2e7d32;
+      }
+
+      &.unavailable {
+        background-color: #ffebee;
+        color: #c62828;
+      }
+    }
+
+    .bed-info, .doctor-info {
+      font-size: 0.9em;
+      
+      div {
+        margin-bottom: 4px;
+        
+        &:last-child {
+          margin-bottom: 0;
+        }
+      }
+    }
+  }
+
+  .hospital-show-btn {
+    padding: 6px 12px;
+    background-color: #2196F3;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9em;
+
+    &:hover {
+      background-color: #1976D2;
+    }
+  }
+}
+
+// Responsive design
+@media (max-width: 800px) {
+  .hospital-page {
+    .hospital-table-wrapper {
+      padding: 1rem 0.2rem;
+    }
+    .hospital-table {
+      font-size: 0.95rem;
+      th, td {
+        padding: 0.6rem 0.5rem;
+      }
+    }
+  }
+}
+
+@media (max-width: 500px) {
+  .hospital-page {
+    padding: 1rem 0.2rem;
+    .hospital-title {
+      font-size: 1.2rem;
+    }
+    .hospital-table-wrapper {
+      padding: 0.5rem 0.1rem;
+    }
+    .hospital-table {
+      font-size: 0.85rem;
+      th, td {
+        padding: 0.4rem 0.2rem;
+      }
+    }
+  }
+} 

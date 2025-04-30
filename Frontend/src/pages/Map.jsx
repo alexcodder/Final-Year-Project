@@ -1,47 +1,14 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
+import axios from 'axios';
+import { toast } from 'react-toastify';
+import { useLocation } from 'react-router-dom';
 
 // Kathmandu coordinates
 const KATHMANDU_CENTER = {
   lat: 27.7172,
   lng: 85.3240
-};
-
-// Sample data - Replace with your actual data from backend
-const healthcareLocations = [
-  {
-    id: 1,
-    name: "Bir Hospital",
-    type: "hospital",
-    position: { lat: 27.7044, lng: 85.3174 },
-    address: "Kathmandu 44600",
-    contact: "+977-1-4221110",
-    available: true
-  },
-  {
-    id: 2,
-    name: "Tribhuvan University Teaching Hospital",
-    type: "hospital",
-    position: { lat: 27.7324, lng: 85.3184 },
-    address: "Maharajgunj, Kathmandu",
-    contact: "+977-1-4412503",
-    available: true
-  },
-  {
-    id: 3,
-    name: "Central Blood Bank",
-    type: "bloodbank",
-    position: { lat: 27.7044, lng: 85.3174 },
-    address: "Teku, Kathmandu",
-    contact: "+977-1-4221110",
-    available: true
-  }
-];
-
-const containerStyle = {
-  width: '100%',
-  height: '80vh'
 };
 
 // Custom icons for different types of locations
@@ -66,44 +33,106 @@ const bloodBankIcon = new L.Icon({
 function Map() {
   const [selectedLocation, setSelectedLocation] = useState(null);
   const [filter, setFilter] = useState('all');
-  const [map, setMap] = useState(null);
-  const [markers, setMarkers] = useState([]);
+  const [locations, setLocations] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const mapRef = useRef(null);
+  const mapInstanceRef = useRef(null);
+  const markersRef = useRef([]);
+  const location = useLocation();
+  const focusHospital = location.state?.focusHospital;
 
+  // Fetch locations from backend
   useEffect(() => {
-    // Initialize map
-    const mapInstance = L.map('map').setView([KATHMANDU_CENTER.lat, KATHMANDU_CENTER.lng], 13);
-    
-    // Add tile layer
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-    }).addTo(mapInstance);
-
-    setMap(mapInstance);
-
-    // Cleanup
-    return () => {
-      mapInstance.remove();
+    const fetchLocations = async () => {
+      try {
+        const response = await axios.get('http://localhost:3001/api/v1/hospitals');
+        if (response.data.success) {
+          setLocations(response.data.data);
+        } else {
+          toast.error('Failed to fetch locations');
+        }
+      } catch (error) {
+        console.error('Error fetching locations:', error);
+        toast.error('Error fetching locations. Please try again later.');
+      } finally {
+        setIsLoading(false);
+      }
     };
+
+    fetchLocations();
   }, []);
 
+  // Initialize map
   useEffect(() => {
-    if (!map) return;
+    if (isLoading) return; // Wait until loading is done
+    if (!mapRef.current) {
+      console.log('Map ref is not ready');
+      return;
+    }
 
-    // Clear existing markers
-    markers.forEach(marker => marker.remove());
-    const newMarkers = [];
+    // Only initialize if the container has a height
+    const checkAndInit = () => {
+      const height = mapRef.current.offsetHeight;
+      console.log('Map container height:', height);
+      if (height && !mapInstanceRef.current) {
+        console.log('Initializing map...');
+        const map = L.map(mapRef.current).setView([KATHMANDU_CENTER.lat, KATHMANDU_CENTER.lng], 13);
+        
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          attribution: '&copy; <a href=\"https://www.openstreetmap.org/copyright\">OpenStreetMap</a> contributors'
+        }).addTo(map);
 
-    // Add new markers
-    const filteredLocations = healthcareLocations.filter(location => {
-      if (filter === 'all') return true;
-      return location.type === filter;
-    });
+        mapInstanceRef.current = map;
+        setTimeout(() => {
+          map.invalidateSize();
+          console.log('Map size invalidated');
+        }, 0);
+      } else if (!height) {
+        // Try again after a short delay if height is 0
+        console.log('Height is 0, retrying...');
+        setTimeout(checkAndInit, 100);
+      }
+    };
+
+    checkAndInit();
+
+    return () => {
+      if (mapInstanceRef.current) {
+        mapInstanceRef.current.remove();
+        mapInstanceRef.current = null;
+        console.log('Map cleaned up');
+      }
+    };
+  }, [isLoading]);
+
+  // Update markers when locations or filter changes
+  useEffect(() => {
+    if (!mapInstanceRef.current) return;
+
+    markersRef.current.forEach(marker => marker.remove());
+    markersRef.current = [];
+
+    let filteredLocations = locations;
+    if (focusHospital) {
+      filteredLocations = locations.filter(
+        loc =>
+          loc._id === focusHospital.id ||
+          (loc.position?.lat === focusHospital.lat &&
+           loc.position?.lng === focusHospital.lng)
+      );
+      if (filteredLocations.length && mapInstanceRef.current) {
+        mapInstanceRef.current.setView(
+          [focusHospital.lat, focusHospital.lng],
+          16
+        );
+      }
+    }
 
     filteredLocations.forEach(location => {
       const marker = L.marker([location.position.lat, location.position.lng], {
         icon: location.type === 'hospital' ? hospitalIcon : bloodBankIcon
       })
-        .addTo(map)
+        .addTo(mapInstanceRef.current)
         .bindPopup(`
           <div class="info-window">
             <h3>${location.name}</h3>
@@ -118,11 +147,17 @@ function Map() {
         setSelectedLocation(location);
       });
 
-      newMarkers.push(marker);
+      markersRef.current.push(marker);
     });
+  }, [locations, filter, focusHospital]);
 
-    setMarkers(newMarkers);
-  }, [map, filter]);
+  if (isLoading) {
+    return (
+      <div className="map-container">
+        <div className="loading">Loading map data...</div>
+      </div>
+    );
+  }
 
   return (
     <div className="map-container">
@@ -150,7 +185,7 @@ function Map() {
         </div>
       </div>
 
-      <div id="map" style={containerStyle}></div>
+      <div ref={mapRef} id="map"></div>
     </div>
   );
 }

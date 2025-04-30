@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import Profile from "../assets/image/Profile.png";
 
 // Function to check if the user is logged in
 function UserCheck() {
@@ -37,11 +36,8 @@ function LoginFilter() {
     if (loginStatus) {
         return (
             <div className="auth-buttons">
-                <button className="auth-button notification">
-                    <i className="far fa-bell"></i>
-                </button>
                 <Link to="/profile" className="auth-button profile">
-                    <img src={Profile} alt="Profile" />
+                    <i className="fas fa-user"></i>
                 </Link>
                 <button onClick={handleLogout} className="auth-button logout">
                     <i className="fas fa-sign-out-alt"></i>

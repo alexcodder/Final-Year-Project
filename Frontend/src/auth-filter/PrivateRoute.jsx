@@ -13,7 +13,7 @@ function PrivateRoute({ element: Element }) {
     useEffect(() => {
         // Function to check authentication with the server
         const checkAuthentication = async () => {            
-            try {
+            try {                
                 const token = localStorage.getItem('token');
                 
                 if (!token) {
@@ -104,6 +104,12 @@ function PrivateRoute({ element: Element }) {
     
     const currentPath = window.location.pathname.toLowerCase();
     
+    // Restrict access to specific routes for non-patient users
+    const patientOnlyRoutes = ['/home', '/hospital', '/bloodbank', '/ambulance', '/map'];
+    if (patientOnlyRoutes.includes(currentPath) && authState.userRole !== 'patient') {
+        console.log("Access denied: This page is only accessible to patients");
+        return <Navigate to="/" />;
+    }
     if (currentPath === '/admin-dashboard' && authState.userRole !== 'admin') {
         return <Navigate to="/login" />;
     }

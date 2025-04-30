@@ -3,7 +3,6 @@ import { BrowserRouter as Router, Route, Routes, useLocation, Link } from "react
 import { useState, useEffect } from "react";
 import axios from "axios";
 import PrivateRoute from "./auth-filter/PrivateRoute";
-import PropTypes from 'prop-types';
 
 import ScrollToTop from "./components/ScrollToTop";
 import Header from "./components/Header/Header.jsx";
@@ -28,6 +27,9 @@ import DashboardBloodBank from './pages/dashboard/DashboardBloodBank.jsx';
 import PatientHistoryForm from "./components/Forms/Patient.jsx";
 import UpdatePatientHistory from "./components/Forms/UpdateProfile.jsx";
 import EditProfileForm from "./components/Forms/EditProfileForm.jsx";
+import AddHospital from "./components/Forms/AddHospital.jsx";
+import AddBloodBank from "./components/Forms/AddBloodBank.jsx";
+
 
 // Import Profile Components
 import PatientProfile from "./pages/Profile.jsx";
@@ -44,6 +46,11 @@ import "./stylesheets/PatientForm.scss";
 import "./stylesheets/Profile.scss";
 import "./stylesheets/UpdateProfile.scss";
 import "./stylesheets/EditProfileForm.scss";
+import "./stylesheets/AddHospital.scss";
+import "./stylesheets/Map.scss";
+import "./stylesheets/HospitalDashboard.scss";
+import "./stylesheets/Blood.scss";
+
 
 import React from "react";
 
@@ -64,12 +71,14 @@ function AppContent() {
       {showHeaderFooter && <Header />}
       <div className="AppLayout">
         <div className="ContentWrapper">
-          <Routes>
+          <Routes>  
+            {/* Home Routes */}
             <Route path="/" element={<Index />} />
             <Route path="/home" element={<Index />} />
+
+            {/* Login and Signup Routes */}
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<SignUp />} />
-            <Route path="/PatientHistoryForm" element={<PatientHistoryForm />} />
 
             {/* Protected Routes */}
             <Route path="/Hospital" element={<PrivateRoute element={<Hospital />} />} />
@@ -84,8 +93,15 @@ function AppContent() {
             <Route path="/hospital-dashboard" element={<PrivateRoute element={<DashboardHospital />} />} />
             <Route path="/bloodbank-dashboard" element={<PrivateRoute element={<DashboardBloodBank />} />} />
 
-            {/* Profile Routes - Normal patient pages */}
+            {/* Profile Routes */}
             <Route path="/patient/profile" element={<PrivateRoute element={<PatientProfile />} />} />
+
+            {/* Create Form Routes */}
+            <Route path="/PatientHistoryForm" element={<PatientHistoryForm />} />
+            <Route path="/Add-hospital" element={<PrivateRoute element={<AddHospital />} />} /> 
+            <Route path="/Add-bloodbank" element={<PrivateRoute element={<AddBloodBank />} />} />
+
+            {/* Edit Form Routes */}
             <Route path="/patient-history/edit" element={<PrivateRoute element={<UpdatePatientHistory />} />} />
             <Route path="/patient/profile/edit" element={<PrivateRoute element={<EditProfileForm />} />} />
           </Routes>

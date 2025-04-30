@@ -214,4 +214,18 @@
       }
     }
   }
+
+  .add-hospital-card {
+    padding: 40px 64px;
+  }
+  @media (max-width: 900px) {
+    .add-hospital-card {
+      padding: 24px 12px;
+    }
+  }
+
+  .MuiButton-contained, .submit-button {
+    height: 48px;
+    min-width: 120px;
+  }
 } 
