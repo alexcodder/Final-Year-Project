@@ -22,6 +22,11 @@ const Signup = async (req, res) => {
             return sendErrorResponse(res, 400, "All fields are required");
         }
 
+        // Split name into firstName and lastName
+        const nameParts = name.trim().split(' ');
+        const firstName = nameParts[0];
+        const lastName = nameParts.slice(1).join(' ');
+
         // Validate role
         const validRoles = ['patient', 'ambulance', 'hospital', 'bloodbank'];
         if (!validRoles.includes(role.toLowerCase())) {
@@ -41,7 +46,8 @@ const Signup = async (req, res) => {
         }
 
         const userData = {
-            name,
+            firstName,
+            lastName,
             username: username.toLowerCase(),
             email: email.toLowerCase(),
             password: password,
@@ -77,7 +83,8 @@ const Signup = async (req, res) => {
             token: token,
             user: {
                 id: user._id,
-                name: user.name,
+                firstName: user.firstName,
+                lastName: user.lastName,
                 username: user.username,
                 email: user.email,
                 role: user.role
@@ -126,7 +133,7 @@ const Login = async (req, res) => {
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production',
             sameSite: 'strict',
-            maxAge: 24 * 60 * 60 * 1000 // 24 hours
+            maxAge: 7 * 24 * 60 * 60 * 1000 
         });
 
         res.json({

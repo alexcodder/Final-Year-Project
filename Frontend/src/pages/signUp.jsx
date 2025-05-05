@@ -5,7 +5,8 @@ import { setAuthToken } from '../utils/auth';
 
 function SignUp() {
   const [registerData, setRegisterData] = useState({
-    name: "",
+    firstName: "",
+    lastName: "",
     email: "",
     username: "",
     password: "",
@@ -44,8 +45,14 @@ function SignUp() {
 
     try {
       // Validate form data before submission
-      if (!registerData.name.trim()) {
-        setError('Name is required');
+      if (!registerData.firstName.trim()) {
+        setError('First name is required');
+        setIsLoading(false);
+        return;
+      }
+
+      if (!registerData.lastName.trim()) {
+        setError('Last name is required');
         setIsLoading(false);
         return;
       }
@@ -87,7 +94,7 @@ function SignUp() {
       }
 
       const response = await axios.post('http://localhost:3001/api/v1/auth/signup', {
-        name: registerData.name.trim(),
+        name: `${registerData.firstName.trim()} ${registerData.lastName.trim()}`,
         username: registerData.username.trim(),
         email: registerData.email.trim(),
         password: registerData.password,
@@ -167,16 +174,32 @@ function SignUp() {
 
         <form className="signup-form" onSubmit={handleSubmit}>
           <div className="form-group">
-            <label htmlFor="name">
+            <label htmlFor="firstName">
               <i className="fas fa-user"></i>
-              Full Name
+              First Name
             </label>
             <input
               type="text"
-              id="name"
-              name="name"
-              placeholder="Enter your full name"
-              value={registerData.name}
+              id="firstName"
+              name="firstName"
+              placeholder="Enter your first name"
+              value={registerData.firstName}
+              onChange={handleChange}
+              required
+            />
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="lastName">
+              <i className="fas fa-user"></i>
+              Last Name
+            </label>
+            <input
+              type="text"
+              id="lastName"
+              name="lastName"
+              placeholder="Enter your last name"
+              value={registerData.lastName}
               onChange={handleChange}
               required
             />

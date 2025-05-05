@@ -76,7 +76,7 @@ function PatientProfile() {
             <div className="welcome-section">
               <div className="welcome-card">
                 <div className="welcome-content">
-                  <h2>Welcome back, {patientData?.name || "Patient"}!</h2>
+                  <h2>Welcome back, {patientData?.firstName ? `${patientData.firstName} ${patientData.lastName || ''}` : "Patient"}!</h2>
                   <p>Here's your health dashboard overview</p>
                 </div>
                 <div className="welcome-actions">
@@ -126,7 +126,7 @@ function PatientProfile() {
                 <div className="info-content">
                   <div className="info-item">
                     <span className="label">Name</span>
-                    <span className="value">{patientData?.name}</span>
+                    <span className="value">{patientData?.firstName ? `${patientData.firstName} ${patientData.lastName || ''}` : 'Not set'}</span>
                   </div>
                   <div className="info-item">
                     <span className="label">Username</span>

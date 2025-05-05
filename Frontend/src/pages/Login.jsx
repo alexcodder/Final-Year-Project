@@ -66,6 +66,16 @@ function Login() {
       if (response.data.success) {
         // If user is a patient, check for patient history
         if (response.data.user.role === "patient") {
+          // Store user data first
+          localStorage.setItem("userId", response.data.user.id);
+          localStorage.setItem("role", response.data.user.role);
+          localStorage.setItem("username", response.data.user.username);
+          localStorage.setItem("token", response.data.token);
+
+          // Set default axios headers
+          axios.defaults.headers.common['Authorization'] = `Bearer ${response.data.token}`;
+          axios.defaults.withCredentials = true;
+
           try {
             const historyResponse = await axios.get(
               "http://localhost:3001/api/v1/patient-history/history",
@@ -77,54 +87,52 @@ function Login() {
                 withCredentials: true
               }
             );
-
-            localStorage.setItem("tempUserId", response.data.user.id);
-            localStorage.setItem("tempToken", response.data.token);
-            localStorage.setItem("tempUsername", response.data.user.username);
             
-            // If no history data or empty history
-            if (!historyResponse.data.success || !historyResponse.data.data) {
-              // Redirect to patient history form
-              navigate("/patienthistoryform");
+            // If history exists and is successful, proceed to home
+            if (historyResponse.data.success && historyResponse.data.data) {
+              navigate("/home");
               return;
             }
           } catch (error) {
+            // Check if it's a 404 error (no history found)
+            if (error.response?.status === 404) {
+              navigate("/patienthistoryform");
+              return;
+            }
+            // For other errors, show error message
             console.error("History check error:", error);
             navigate("/patienthistoryform");
+            setError("Error checking patient history. No Patient history found.");
             return;
           }
-        }
-            
-        // Store user data in localStorage
-        localStorage.setItem("userId", response.data.user.id);
-        localStorage.setItem("role", response.data.user.role);
-        localStorage.setItem("username", response.data.user.username);
-        localStorage.setItem("token", response.data.token);
+        } else {
+          // For non-patient users, store data and redirect
+          localStorage.setItem("userId", response.data.user.id);
+          localStorage.setItem("role", response.data.user.role);
+          localStorage.setItem("username", response.data.user.username);
+          localStorage.setItem("token", response.data.token);
 
-        // Set default axios headers
-        axios.defaults.headers.common['Authorization'] = `Bearer ${response.data.token}`;
-        axios.defaults.withCredentials = true;
+          // Set default axios headers
+          axios.defaults.headers.common['Authorization'] = `Bearer ${response.data.token}`;
+          axios.defaults.withCredentials = true;
 
-        // Redirect based on role
-        switch (response.data.user.role) {
-          case "admin":
-            navigate("/admin-dashboard");
-            break;
-          case "patient":
-            navigate("/home");
-            break;
-          case "ambulance":
-            navigate("/ambulance-dashboard");
-            break;
-          case "hospital":
-            navigate("/hospital-dashboard");
-            break;
-          case "bloodbank":
-            navigate("/bloodbank-dashboard");
-            break;
-          default:
-            navigate("/home");
-            break;
+          // Redirect based on role
+          switch (response.data.user.role) {
+            case "admin":
+              navigate("/admin-dashboard");
+              break;
+            case "ambulance":
+              navigate("/ambulance-dashboard");
+              break;
+            case "hospital":
+              navigate("/hospital-dashboard");
+              break;
+            case "bloodbank":
+              navigate("/bloodbank-dashboard");
+              break;
+            default:
+              navigate("/home");
+          }
         }
       }
     } catch (error) {

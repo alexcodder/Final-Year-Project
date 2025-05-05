@@ -57,6 +57,44 @@ function PatientHistoryForm() {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+    
+    // Phone number validation
+    if (name === "phoneNumber" || name === "emergencyContact.phoneNumber") {
+      // Only allow digits and limit to 10 characters
+      const phoneValue = value.replace(/\D/g, '').slice(0, 10);
+      if (name.includes(".")) {
+        const [parent, child] = name.split(".");
+        setFormData(prev => ({
+          ...prev,
+          [parent]: {
+            ...prev[parent],
+            [child]: phoneValue
+          }
+        }));
+      } else {
+        setFormData(prev => ({
+          ...prev,
+          [name]: phoneValue
+        }));
+      }
+      return;
+    }
+
+    // Date of birth validation
+    if (name === "dateOfBirth") {
+      const selectedDate = new Date(value);
+      const today = new Date();
+      const minDate = new Date();
+      minDate.setFullYear(today.getFullYear() - 3);
+
+      if (selectedDate > minDate) {
+        setError('Age must be at least 3 years old');
+        return;
+      } else {
+        setError(''); // Clear error if date is valid
+      }
+    }
+
     if (name.includes(".")) {
       const [parent, child] = name.split(".");
       setFormData(prev => ({
@@ -116,16 +154,34 @@ function PatientHistoryForm() {
       return;
     }
 
-    // Validate numeric fields
-    if (isNaN(parseFloat(formData.height)) || isNaN(parseFloat(formData.weight))) {
-      setError('Height and weight must be valid numbers');
+    // Validate date of birth
+    const selectedDate = new Date(formData.dateOfBirth);
+    const today = new Date();
+    const minDate = new Date();
+    minDate.setFullYear(today.getFullYear() - 3);
+
+    if (selectedDate > minDate) {
+      setError('Age must be at least 3 years old');
       setIsLoading(false);
       return;
     }
 
-    // Validate date
-    if (!formData.dateOfBirth || isNaN(new Date(formData.dateOfBirth).getTime())) {
-      setError('Please enter a valid date of birth');
+    // Validate phone numbers
+    if (!/^\d{10}$/.test(formData.phoneNumber)) {
+      setError('Please enter a valid phone number (10 digits)');
+      setIsLoading(false);
+      return;
+    }
+
+    if (!/^\d{10}$/.test(formData.emergencyContact.phoneNumber)) {
+      setError('Please enter a valid emergency contact phone number (10 digits)');
+      setIsLoading(false);
+      return;
+    }
+
+    // Validate numeric fields
+    if (isNaN(parseFloat(formData.height)) || isNaN(parseFloat(formData.weight))) {
+      setError('Height and weight must be valid numbers');
       setIsLoading(false);
       return;
     }
@@ -168,7 +224,7 @@ function PatientHistoryForm() {
           headers: {
             "Content-Type": "application/json",
             "Accept": "application/json",
-            "Authorization": `Bearer ${token}`
+            "Authorization": `Bearer ${token}`,
           },
           withCredentials: true
         }
@@ -225,8 +281,11 @@ function PatientHistoryForm() {
                 name="dateOfBirth"
                 value={formData.dateOfBirth}
                 onChange={handleChange}
+                max={new Date(new Date().setFullYear(new Date().getFullYear() - 3)).toISOString().split('T')[0]}
+                title="Must be at least 3 years old"
                 required
               />
+              <small className="form-text text-muted">Must be at least 3 years old</small>
             </div>
             <div className="form-group">
               <label>Gender</label>
@@ -301,7 +360,9 @@ function PatientHistoryForm() {
                 name="phoneNumber"
                 value={formData.phoneNumber}
                 onChange={handleChange}
-                placeholder="Enter your phone number"
+                placeholder="Enter your phone number (10 digits)"
+                pattern="\d{10}"
+                title="Please enter a valid phone number (10 digits)"
                 required
               />
             </div>
@@ -339,7 +400,9 @@ function PatientHistoryForm() {
                 name="emergencyContact.phoneNumber"
                 value={formData.emergencyContact.phoneNumber}
                 onChange={handleChange}
-                placeholder="Enter emergency contact phone number"
+                placeholder="Enter emergency contact phone number (10 digits)"
+                pattern="\d{10}"
+                title="Please enter a valid phone number (10 digits)"
                 required
               />
             </div>
@@ -404,6 +467,7 @@ function PatientHistoryForm() {
                 name="smoking"
                 value={formData.smoking}
                 onChange={handleChange}
+                required
               >
                 <option value="">Select Smoking Status</option>
                 <option value="never">Never</option>
@@ -417,6 +481,7 @@ function PatientHistoryForm() {
                 name="alcohol"
                 value={formData.alcohol}
                 onChange={handleChange}
+                required
               >
                 <option value="">Select Alcohol Consumption</option>
                 <option value="never">Never</option>
@@ -430,6 +495,7 @@ function PatientHistoryForm() {
                 name="exercise"
                 value={formData.exercise}
                 onChange={handleChange}
+                required
               >
                 <option value="">Select Exercise Frequency</option>
                 <option value="never">Never</option>
