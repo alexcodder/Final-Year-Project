@@ -11,7 +11,6 @@ const KATHMANDU_CENTER = {
   lng: 85.3240
 };
 
-// Custom icons for different types of locations
 const hospitalIcon = new L.Icon({
   iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-blue.png',
   shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
@@ -129,19 +128,45 @@ function Map() {
     }
 
     filteredLocations.forEach(location => {
+      // Format address
+      const formattedAddress = location.address && typeof location.address === 'object' 
+        ? `${location.address.street || ''}, ${location.address.city || ''}, ${location.address.state || ''}`
+        : location.address || 'Address not available';
+
       const marker = L.marker([location.position.lat, location.position.lng], {
         icon: location.type === 'hospital' ? hospitalIcon : bloodBankIcon
       })
         .addTo(mapInstanceRef.current)
         .bindPopup(`
-          <div class="info-window">
-            <h3>${location.name}</h3>
-            <p><strong>Type:</strong> ${location.type}</p>
-            <p><strong>Address:</strong> ${location.address}</p>
-            <p><strong>Contact:</strong> ${location.contact}</p>
-            <p><strong>Status:</strong> ${location.available ? 'Available' : 'Busy'}</p>
+          <div class="info-window" style="min-width: 200px; padding: 10px;">
+            <h3 style="margin: 0 0 10px 0; color: #2c3e50; font-size: 16px; border-bottom: 2px solid #3498db; padding-bottom: 5px;">
+              ${location.name || 'Unnamed Location'}
+            </h3>
+            <div style="font-size: 14px; line-height: 1.4;">
+              <p style="margin: 5px 0;"><strong style="color: #34495e;">Type:</strong> ${location.type || 'Not specified'}</p>
+              <p style="margin: 5px 0;"><strong style="color: #34495e;">Address:</strong> ${formattedAddress}</p>
+              <p style="margin: 5px 0;"><strong style="color: #34495e;">Contact:</strong> ${location.phone || location.contact || 'Not available'}</p>
+              <p style="margin: 5px 0;">
+                <strong style="color: #34495e;">Status:</strong> 
+                <span style="color: ${location.available ? '#27ae60' : '#e74c3c'}; font-weight: bold;">
+                  ${location.available ? 'Available' : 'Closed'}
+                </span>
+              </p>
+              ${location.emergencyServices ? 
+                `<p style="margin: 5px 0;">
+                  <strong style="color: #34495e;">Emergency Services:</strong> 
+                  <span style="color: #27ae60; font-weight: bold;">Available</span>
+                </p>` : ''}
+              ${location.hotline ? 
+                `<p style="margin: 5px 0;">
+                  <strong style="color: #34495e;">Hotline:</strong> ${location.hotline}
+                </p>` : ''}
+            </div>
           </div>
-        `);
+        `, {
+          maxWidth: 300,
+          className: 'custom-popup'
+        });
 
       marker.on('click', () => {
         setSelectedLocation(location);

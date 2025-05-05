@@ -28,7 +28,7 @@ const Signup = async (req, res) => {
         const lastName = nameParts.slice(1).join(' ');
 
         // Validate role
-        const validRoles = ['patient', 'ambulance', 'hospital', 'bloodbank'];
+        const validRoles = ['patient', 'ambulance', 'hospital'];
         if (!validRoles.includes(role.toLowerCase())) {
             return sendErrorResponse(res, 400, "Invalid role selected");
         }

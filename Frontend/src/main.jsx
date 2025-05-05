@@ -10,7 +10,6 @@ import Footer from "./components/Footer/Footer.jsx";
 
 import Index from "./pages/Index.jsx";
 import Hospital from "./pages/Hospital.jsx";
-import BloodBank from "./pages/Blood.jsx";
 import Ambulance from "./pages/Ambulance.jsx";
 import Map from "./pages/Map.jsx";
 
@@ -21,14 +20,12 @@ import Profile from "./pages/Profile.jsx";
 import AdminDashboard from "./pages/dashboard/adminDashboardPages/AdminDashboard.jsx";
 import DashboardAmbulance from "./pages/dashboard/DashboardAmbulance.jsx";
 import DashboardHospital from './pages/dashboard/DashboardHospital.jsx';
-import DashboardBloodBank from './pages/dashboard/DashboardBloodBank.jsx';
 
 // Import Form Components
 import PatientHistoryForm from "./components/Forms/Patient.jsx";
 import UpdatePatientHistory from "./components/Forms/UpdateProfile.jsx";
 import EditProfileForm from "./components/Forms/EditProfileForm.jsx";
 import AddHospital from "./components/Forms/AddHospital.jsx";
-import AddBloodBank from "./components/Forms/AddBloodBank.jsx";
 
 
 // Import Profile Components
@@ -49,7 +46,6 @@ import "./stylesheets/EditProfileForm.scss";
 import "./stylesheets/AddHospital.scss";
 import "./stylesheets/Map.scss";
 import "./stylesheets/HospitalDashboard.scss";
-import "./stylesheets/Blood.scss";
 
 
 import React from "react";
@@ -82,7 +78,6 @@ function AppContent() {
 
             {/* Protected Routes */}
             <Route path="/Hospital" element={<PrivateRoute element={<Hospital />} />} />
-            <Route path="/BloodBank" element={<PrivateRoute element={<BloodBank />} />} />
             <Route path="/Ambulance" element={<PrivateRoute element={<Ambulance />} />} />
             <Route path="/Map" element={<PrivateRoute element={<Map />} />} />
             <Route path="/Profile" element={<PrivateRoute element={<Profile />} />} />
@@ -91,7 +86,6 @@ function AppContent() {
             <Route path="/admin-dashboard" element={<PrivateRoute element={<AdminDashboard />} />} />
             <Route path="/ambulance-dashboard" element={<PrivateRoute element={<DashboardAmbulance />} />} />
             <Route path="/hospital-dashboard" element={<PrivateRoute element={<DashboardHospital />} />} />
-            <Route path="/bloodbank-dashboard" element={<PrivateRoute element={<DashboardBloodBank />} />} />
 
             {/* Profile Routes */}
             <Route path="/patient/profile" element={<PrivateRoute element={<PatientProfile />} />} />
@@ -99,7 +93,6 @@ function AppContent() {
             {/* Create Form Routes */}
             <Route path="/PatientHistoryForm" element={<PatientHistoryForm />} />
             <Route path="/Add-hospital" element={<PrivateRoute element={<AddHospital />} />} /> 
-            <Route path="/Add-bloodbank" element={<PrivateRoute element={<AddBloodBank />} />} />
 
             {/* Edit Form Routes */}
             <Route path="/patient-history/edit" element={<PrivateRoute element={<UpdatePatientHistory />} />} />

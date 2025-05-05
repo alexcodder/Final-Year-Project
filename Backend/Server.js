@@ -8,7 +8,6 @@ const authRoutes = require("./Routes/authRouter");
 const userRoutes = require("./Routes/userRoutes");
 const patientHistoryRoutes = require("./Routes/patientHistoryRoutes");
 const hospitalRoutes = require("./Routes/hospitalRoutes");
-const bloodBankRoutes = require("./Routes/bloodBankRoutes");
 
 // Load environment variables
 dotenv.config();
@@ -43,7 +42,6 @@ app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1/users", userRoutes);
 app.use("/api/v1/patient-history", patientHistoryRoutes);
 app.use("/api/v1/hospitals", hospitalRoutes);
-app.use("/api/v1/blood-banks", bloodBankRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {
