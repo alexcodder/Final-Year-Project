@@ -4,10 +4,7 @@ const cors = require("cors");
 const dotenv = require("dotenv");
 const cookieParser = require("cookie-parser");
 
-const authRoutes = require("./Routes/authRouter");
-const userRoutes = require("./Routes/userRoutes");
-const patientHistoryRoutes = require("./Routes/patientHistoryRoutes");
-const hospitalRoutes = require("./Routes/hospitalRoutes");
+const routes = require('./Routes/index.js');
 
 // Load environment variables
 dotenv.config();
@@ -38,10 +35,7 @@ app.use((req, res, next) => {
 });
 
 // Routes
-app.use("/api/v1/auth", authRoutes);
-app.use("/api/v1/users", userRoutes);
-app.use("/api/v1/patient-history", patientHistoryRoutes);
-app.use("/api/v1/hospitals", hospitalRoutes);
+app.use('/api/v1', routes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {

@@ -33,6 +33,7 @@ function Map() {
   const [selectedLocation, setSelectedLocation] = useState(null);
   const [filter, setFilter] = useState('all');
   const [locations, setLocations] = useState([]);
+  const [bloodBanks, setBloodBanks] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const mapRef = useRef(null);
   const mapInstanceRef = useRef(null);
@@ -59,6 +60,25 @@ function Map() {
     };
 
     fetchLocations();
+  }, []);
+
+  // Fetch blood banks from backend
+  useEffect(() => {
+    const fetchBloodBanks = async () => {
+      try {
+        const response = await axios.get('http://localhost:3001/api/v1/blood-banks');
+        if (response.data.success) {
+          setBloodBanks(response.data.data);
+        } else {
+          toast.error('Failed to fetch blood banks');
+        }
+      } catch (error) {
+        console.error('Error fetching blood banks:', error);
+        toast.error('Error fetching blood banks. Please try again later.');
+      }
+    };
+
+    fetchBloodBanks();
   }, []);
 
   // Initialize map
@@ -127,6 +147,13 @@ function Map() {
       }
     }
 
+    // Filter locations based on the selected filter
+    if (filter === 'hospital') {
+      filteredLocations = locations.filter(loc => loc.type === 'hospital');
+    } else if (filter === 'bloodbank') {
+      filteredLocations = [];
+    }
+
     filteredLocations.forEach(location => {
       // Format address
       const formattedAddress = location.address && typeof location.address === 'object' 
@@ -174,7 +201,70 @@ function Map() {
 
       markersRef.current.push(marker);
     });
-  }, [locations, filter, focusHospital]);
+
+    // Add blood bank markers
+    if (filter === 'all' || filter === 'bloodbank') {
+      bloodBanks.forEach(bank => {
+        // Format address
+        let formattedAddress = 'Address not available';
+        if (bank.address) {
+          if (typeof bank.address === 'object') {
+            const { street, city, state } = bank.address;
+            formattedAddress = [street, city, state].filter(Boolean).join(', ');
+          } else {
+            formattedAddress = bank.address;
+          }
+        }
+        // Format contact
+        let formattedContact = 'Not available';
+        if (bank.phone || bank.hotline) {
+          formattedContact = [
+            bank.phone && `Phone: ${bank.phone}`,
+            bank.hotline && `Hotline: ${bank.hotline}`
+          ].filter(Boolean).join(' | ');
+        }
+        // Format blood types
+        let formattedBloodTypes = 'No blood info';
+        if (Array.isArray(bank.bloodTypes) && bank.bloodTypes.length > 0) {
+          formattedBloodTypes = bank.bloodTypes.map(
+            t => `${t.group}: ${t.available} units`
+          ).join('<br/>');
+        }
+        const marker = L.marker([bank.position.lat, bank.position.lng], {
+          icon: bloodBankIcon
+        })
+          .addTo(mapInstanceRef.current)
+          .bindPopup(`
+            <div class="info-window" style="min-width: 200px; padding: 10px;">
+              <h3 style="margin: 0 0 10px 0; color: #2c3e50; font-size: 16px; border-bottom: 2px solid #3498db; padding-bottom: 5px;">
+                ${bank.name || 'Unnamed Blood Bank'}
+              </h3>
+              <div style="font-size: 14px; line-height: 1.4;">
+                <p style="margin: 5px 0;"><strong style="color: #34495e;">Type:</strong> Blood Bank</p>
+                <p style="margin: 5px 0;"><strong style="color: #34495e;">Address:</strong> ${formattedAddress}</p>
+                <p style="margin: 5px 0;"><strong style="color: #34495e;">Contact:</strong> ${formattedContact}</p>
+                <p style="margin: 5px 0;"><strong style="color: #34495e;">Blood Types:</strong> ${formattedBloodTypes}</p>
+                <p style="margin: 5px 0;">
+                  <strong style="color: #34495e;">Status:</strong> 
+                  <span style="color: ${bank.available ? '#27ae60' : '#e74c3c'}; font-weight: bold;">
+                    ${bank.available ? 'Available' : 'Closed'}
+                  </span>
+                </p>
+              </div>
+            </div>
+          `, {
+            maxWidth: 300,
+            className: 'custom-popup'
+          });
+
+        marker.on('click', () => {
+          setSelectedLocation(bank);
+        });
+
+        markersRef.current.push(marker);
+      });
+    }
+  }, [locations, bloodBanks, filter, focusHospital]);
 
   if (isLoading) {
     return (
@@ -209,8 +299,7 @@ function Map() {
           </button>
         </div>
       </div>
-
-      <div ref={mapRef} id="map"></div>
+      <div ref={mapRef} style={{ height: '800px', width: '90%' }}></div>
     </div>
   );
 }

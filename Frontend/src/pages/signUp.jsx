@@ -263,8 +263,8 @@ function SignUp() {
                   </li>
                   <li className={/\d/.test(registerData.password) ? "valid" : ""}>
                     At least one number
-                  </li>
-                  <li className={/[!@#$%^&*()_+={}\[\]:;"'<>,.?/\\|`~-]/.test(registerData.password) ? "valid" : ""}>
+                  </li>Data
+                  <li className={/[!@#$%^&*()_+={}\[\]:;"'<>,.?/\\|`~-]/.test(register.password) ? "valid" : ""}>
                     At least one special character
                   </li>
                   <li className={registerData.password.length >= 8 ? "valid" : ""}>

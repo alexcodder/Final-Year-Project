@@ -506,7 +506,7 @@ const AddHospital = () => {
               Bed Management
             </Typography>
             <Grid container spacing={2}>
-              <Grid item xs={12} sm={4}>
+              <Grid item xs={6} sx={{ minWidth: 140 }}>
                 <TextField
                   select
                   fullWidth
@@ -521,7 +521,7 @@ const AddHospital = () => {
                   ))}
                 </TextField>
               </Grid>
-              <Grid item xs={12} sm={4}>
+              <Grid item xs={6} sx={{ minWidth: 140 }}>
                 <TextField
                   fullWidth
                   label='Total Beds'
@@ -531,7 +531,7 @@ const AddHospital = () => {
                   onChange={handleBedChange}
                 />
               </Grid>
-              <Grid item xs={12} sm={4}>
+              <Grid item xs={6} sx={{ minWidth: 140 }}>
                 <TextField
                   fullWidth
                   label='Available Beds'
@@ -570,7 +570,7 @@ const AddHospital = () => {
               Doctor Management
             </Typography>
             <Grid container spacing={2}>
-              <Grid item xs={12} sm={4}>
+              <Grid item xs={6} sx={{ minWidth: 140 }}>
                 <TextField
                   fullWidth
                   label='Doctor Name'
@@ -579,7 +579,7 @@ const AddHospital = () => {
                   onChange={handleDoctorChange}
                 />
               </Grid>
-              <Grid item xs={12} sm={4}>
+              <Grid item xs={6} sx={{ minWidth: 140 }}>
                 <TextField
                   select
                   fullWidth
